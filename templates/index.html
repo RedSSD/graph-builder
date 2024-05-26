@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Graph Builder</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<div id="wrapper">
+
+    <body>
+        <h1>Graph Builder</h1>
+        <hr>
+
+        <button onclick="document.querySelector('#help').classList.toggle('hidden')">Help</button>
+        <ul id="help" class="hidden">
+            <li>+ to add node</li>
+            <li>Click node in table header to remove it</li>
+            <li>Click cell to toggle edge</li>
+            <li>~ to toggle all edges for a node</li>
+            <li>~E to toggle all edges</li>
+            <li>E=0 to remove all edges</li>
+            <li>V=0 to remove all nodes</li>
+        </ul>
+
+        <br>
+        <br>
+            <!-- adjaceny matrix interface -->
+                <a name="adjmat">
+                <form action="toggleedge#adjmat" method="GET" id="adjmat">
+                    <table>
+                        <tr class="col-header">
+                            <!-- add node -->
+                            <th><a class="node-btn" href="addnode#adjmat">+{% if graph.nodes|length == 0 %} Create Graph{% endif %}</a></th>
+                        {% for i in graph.nodes|sort %}
+                        <th>
+                            <a class="node-btn delete-btn" href="removenode?label={{i}}#adjmat">{{i}}</a>
+                        </th>
+                        {%endfor%}
+                        <th></th>
+                    </tr>
+
+                    {% for i in graph.nodes|sort %}
+                    <tr>
+                        <td class="row">{{i}}</td>
+                        {% for j in graph.nodes|sort %}
+                        <td {% if i==j %} class="disabled" {% endif %} {% if graph.has_edge(i,j) %} class="active" {%
+                            endif %}>
+
+                            <button type="submit" form="adjmat" name="label" value="{{i}}_{{j}}" {% if i==j %} disabled
+                                {% endif %}>
+                                {% if graph.has_edge(i,j) %} 1 {% else %} 0 {% endif %}
+                            </button>
+                        </td>
+                        {%endfor%}
+                        <td>{% if graph.nodes|length >= 2 %}<a class="node-btn" href="complementnode?label={{i}}#adjmat">~</a>{% endif %}</td>
+
+                    </tr>
+                    {%endfor%}
+
+                </table>
+            </form>
+
+            </br>
+            <!-- complement graph -->
+            <form action="complement#adjmat" method="GET">
+                <button type="submit" id="submit" {% if graph.nodes|length <=1 %}disabled{% endif %}>Toggle all edges</button>
+            </form>
+            <!-- clear edges -->
+            <form action="clearedges#adjmat" method="GET">
+                <button type="submit" id="submit" {% if graph.edges|length==0 %}disabled{% endif %}>Remove all edges</button>
+            </form>
+            <!-- clear graph -->
+            <form action="clear#adjmat" method="GET">
+                <button type="submit" id="submit" {% if graph.nodes|length==0 %}disabled{% endif %}>Remove all nodes</button>
+            </form>
+            <img src="data:image/png;base64, {{image_base64}}">
+
+
+    </body>
+</div>
+<!--end wrapper-->
+
+</html>
