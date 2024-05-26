@@ -121,6 +121,46 @@ def cleargraph():
 
     return redirect(url_for('graphInterfaceView'))
 
+@app.route("/dijkstra")
+def dijkstra_algorithm():
+    try:
+        graph = getSessionGraph()
+        s = int(request.args.get('source'))
+        t = int(request.args.get('target'))
+        dijkstra_path = nx.dijkstra_path(G=graph, source=s, target=t)
+        print(dijkstra_path)
+        path_length = nx.dijkstra_path_length(G=graph, source=s, target=t)
+        # draw graph
+        nx.draw_networkx(graph, font_color='white', pos=nx.circular_layout(graph))
+
+        path_edges = list(zip(dijkstra_path, dijkstra_path[1:]))
+        nx.draw_networkx_nodes(G=graph, pos=nx.circular_layout(graph), nodelist=dijkstra_path, node_color='black')
+        nx.draw_networkx_edges(G=graph, pos=nx.circular_layout(graph), edgelist=path_edges, edge_color='r', width=2.5)
+
+        # base64 encode graph image
+        figfile = BytesIO()
+        plt.savefig(figfile, format='png')
+        plt.close()
+
+        figfile.seek(0)
+        figdata_png = base64.b64encode(figfile.getvalue()).decode('ascii')
+
+        dijkstra_path_response = ""
+        for node in dijkstra_path[:len(dijkstra_path)-1]:
+            dijkstra_path_response += str(node) + " => "
+        dijkstra_path_response += str(dijkstra_path[len(dijkstra_path)-1])
+
+        return (
+            render_template(
+                'index.html',
+                image_base64=figdata_png,
+                matrix=str(nx.to_numpy_array(graph)).replace('.', ',').replace('\n', ','),
+                graph=graph,
+                dijkstra_path=json.dumps(dijkstra_path_response)
+            ))
+    except:
+        return redirect(url_for('graphInterfaceView'))
+
 
 if __name__ == '__main__':
-  app.run(host='0.0.0.0', port='5000')
+  app.run()

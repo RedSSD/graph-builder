@@ -68,6 +68,7 @@
                 </table>
             </form>
 
+
             </br>
             <!-- complement graph -->
             <form action="complement#adjmat" method="GET">
@@ -82,6 +83,19 @@
                 <button type="submit" id="submit" {% if graph.nodes|length==0 %}disabled{% endif %}>Remove all nodes</button>
             </form>
             <img src="data:image/png;base64, {{image_base64}}">
+            <form action="dijkstra#adjmat" method="GET">
+                <input name="source" placeholder="from">
+                <input name="target" placeholder="to">
+                <button type="submit" id="submit" {% if graph.edges|length==0 %}disabled{% endif %}>Dijkstra algorithm</button>
+            </form>
+                <div>
+                {% if dijkstra_path %}
+                    <h3>Dijkstra path</h3>
+                    <p>
+                    {{ dijkstra_path }}
+                </p>
+                    {% endif %}
+            </div>
 
 
     </body>
